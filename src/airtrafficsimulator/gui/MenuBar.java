@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -17,6 +18,8 @@ import airtrafficsimulator.io.CsvIo;
 import airtrafficsimulator.io.ParsingException;
 import airtrafficsimulator.io.ParsingResult;
 import airtrafficsimulator.logic.AirTrafficRepository;
+import airtrafficsimulator.model.Airport;
+import airtrafficsimulator.model.Flight;
 
 public class MenuBar extends JMenuBar {
 	
@@ -29,17 +32,25 @@ public class MenuBar extends JMenuBar {
 		populate();
 	}
 	
-	private void fileCsvImportHandler(ActionEvent ae) {
+	@FunctionalInterface
+	interface ParserFunction {
+	    ParsingResult parse(File file) throws IOException, ParsingException;
+	}
+	
+	@FunctionalInterface
+	interface WriterFunction {
+		void write(File file, List<Airport> airports, List<Flight> flights) throws IOException;
+	}
+	
+	private void fileImportHandler(FileNameExtensionFilter fileFilter, ParserFunction fn) {
 		JFileChooser chooser = new JFileChooser();
-	    FileNameExtensionFilter filter = new FileNameExtensionFilter(
-	        "CSV File", "csv");
-	    chooser.setFileFilter(filter);
+	    chooser.setFileFilter(fileFilter);
 	    chooser.setMultiSelectionEnabled(false);
 	    int returnVal = chooser.showOpenDialog(parent);
 	    if(returnVal == JFileChooser.APPROVE_OPTION) {
 	    	File f = chooser.getSelectedFile();
 	    	try {
-				ParsingResult result = CsvIo.parseCsv(f);
+				ParsingResult result = fn.parse(f);
 				repository.clear();
 				repository.addAirports(result.getAirports());
 				repository.addFlights(result.getFlights());
@@ -54,18 +65,16 @@ public class MenuBar extends JMenuBar {
 	    }
 	}
 	
-	private void fileCsvExportHandler(ActionEvent ae) {
+	private void fileExportHandler(FileNameExtensionFilter fileFilter, String extension, WriterFunction fn) {
 		JFileChooser chooser = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter(
-		        "CSV File", "csv");
-		chooser.setFileFilter(filter);
+		chooser.setFileFilter(fileFilter);
 	    chooser.setMultiSelectionEnabled(false);
 	    int returnVal = chooser.showSaveDialog(parent);
 	    if(returnVal == JFileChooser.APPROVE_OPTION) {
 	    	File f = chooser.getSelectedFile();
 	    	String path = f.getAbsolutePath();
-	    	if (!f.getName().endsWith(".csv")) {
-	    		path = path + ".csv";
+	    	if (!f.getName().toLowerCase().endsWith(extension)) {
+	    		path = path + extension;
 	    	}
 	    	File finalFile = new File(path);
 	    	if (finalFile.exists()) {
@@ -80,7 +89,7 @@ public class MenuBar extends JMenuBar {
 	    		}
 	    	}
 	    	try {
-	    		CsvIo.writeCsv(finalFile, repository.getAirports(), repository.getFlights());	    		
+	    		fn.write(finalFile, repository.getAirports(), repository.getFlights());   		
 	    	}
 	    	catch (IOException e) {
 	    		JOptionPane.showMessageDialog(parent, finalFile.getAbsolutePath(), "Greška prilikom upisa", JOptionPane.ERROR_MESSAGE, null);
@@ -92,11 +101,17 @@ public class MenuBar extends JMenuBar {
 		JMenu fileMenu = new JMenu("Fajl");
 		
 		JMenuItem importCsvItem = new JMenuItem("Uvezi iz CSV fajla...");
-		importCsvItem.addActionListener(this::fileCsvImportHandler);
+		importCsvItem.addActionListener((ae) -> {
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV File", "csv");
+			fileImportHandler(filter, CsvIo::parseCsv);
+		});
 		fileMenu.add(importCsvItem);
 		
 		JMenuItem exportCsvItem = new JMenuItem("Izvezi kao CSV...");
-		exportCsvItem.addActionListener(this::fileCsvExportHandler);
+		exportCsvItem.addActionListener((ae) -> {
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV File", "csv");
+			fileExportHandler(filter, ".csv", CsvIo::writeCsv);
+		});
 		fileMenu.add(exportCsvItem);
 
 		add(fileMenu);
