@@ -100,7 +100,7 @@ public class CsvIo {
 	public static void writeCsv(File file, List<Airport> airports, List<Flight> flights) throws IOException {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
 			if (!airports.isEmpty()) {
-				writer.append("# AIRPORTS\n");
+				writer.append("# AIRPORTS\nCODE,NAME,X,Y\n");
 			}
 			for (Airport a : airports) {
 				writer.append(a.getCodeName()
@@ -110,7 +110,7 @@ public class CsvIo {
 			}
 			
 			if (!flights.isEmpty()) {
-				writer.append("# FLIGHTS\n");
+				writer.append("# FLIGHTS\nFROM,TO,DEPARTURE,DURATION\n");
 			}
 			for (Flight f : flights) {
 				writer.append(
