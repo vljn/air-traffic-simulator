@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import airtrafficsimulator.io.CsvIo;
+import airtrafficsimulator.io.JsonIo;
 import airtrafficsimulator.io.ParsingException;
 import airtrafficsimulator.io.ParsingResult;
 import airtrafficsimulator.logic.AirTrafficRepository;
@@ -107,6 +108,13 @@ public class MenuBar extends JMenuBar {
 		});
 		fileMenu.add(importCsvItem);
 		
+		JMenuItem importJsonItem = new JMenuItem("Uvezi iz JSON fajla...");
+		importJsonItem.addActionListener((ae) -> {
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON File", "json");
+			fileImportHandler(filter, JsonIo::parseJson);
+		});
+		fileMenu.add(importJsonItem);
+		
 		JMenuItem exportCsvItem = new JMenuItem("Izvezi kao CSV...");
 		exportCsvItem.addActionListener((ae) -> {
 			FileNameExtensionFilter filter = new FileNameExtensionFilter("CSV File", "csv");
@@ -114,6 +122,13 @@ public class MenuBar extends JMenuBar {
 		});
 		fileMenu.add(exportCsvItem);
 
+		JMenuItem exportJsonItem = new JMenuItem("Izvezi kao JSON...");
+		exportJsonItem.addActionListener((ae) -> {
+			FileNameExtensionFilter filter = new FileNameExtensionFilter("JSON File", "json");
+			fileExportHandler(filter, ".json", JsonIo::writeJson);
+		});
+		fileMenu.add(exportJsonItem);
+		
 		add(fileMenu);
 	}
 }
