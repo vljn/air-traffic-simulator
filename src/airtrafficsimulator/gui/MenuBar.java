@@ -25,9 +25,9 @@ import airtrafficsimulator.model.Flight;
 public class MenuBar extends JMenuBar {
 	
 	private AirTrafficRepository repository;
-	private JFrame parent;
+	private MainFrame parent;
 	
-	public MenuBar(AirTrafficRepository atc, JFrame parent) {
+	public MenuBar(AirTrafficRepository atc, MainFrame parent) {
 		repository = atc;
 		this.parent = parent;
 		populate();
@@ -55,6 +55,7 @@ public class MenuBar extends JMenuBar {
 				repository.clear();
 				repository.addAirports(result.getAirports());
 				repository.addFlights(result.getFlights());
+				parent.refreshRepository();
 			} catch (FileNotFoundException e) {
 				String message = "Fajl " + f.getAbsolutePath() + " nije pronađen.";
 				JOptionPane.showMessageDialog(parent, message, "Greška prilikom otvaranja fajla", JOptionPane.ERROR_MESSAGE, null);
@@ -114,6 +115,8 @@ public class MenuBar extends JMenuBar {
 			fileImportHandler(filter, JsonIo::parseJson);
 		});
 		fileMenu.add(importJsonItem);
+		
+		fileMenu.addSeparator();
 		
 		JMenuItem exportCsvItem = new JMenuItem("Izvezi kao CSV...");
 		exportCsvItem.addActionListener((ae) -> {
