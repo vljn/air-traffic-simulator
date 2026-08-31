@@ -11,6 +11,8 @@ Java Swing application for managing and simulating airports and flights. The pro
 - Simple GUI-based workflow
 - Simulate flights on an animated map
 
+![Screenshot of the app](app-screenshot.png)
+
 ## Project structure
 
 - `src/airtrafficsimulator/Main.java` — application entry point
