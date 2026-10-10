@@ -2,6 +2,8 @@
 
 Java Swing application for managing and simulating airports and flights. The project supports importing/exporting data in CSV and JSON formats and provides a basic GUI for data manipulation and simulation management.
 
+![Screenshot of the app](app-screenshot.png)
+
 ## Features
 
 - Add, remove and display airports
@@ -10,8 +12,6 @@ Java Swing application for managing and simulating airports and flights. The pro
 - Export data to CSV and JSON files
 - Simple GUI-based workflow
 - Simulate flights on an animated map
-
-![Screenshot of the app](app-screenshot.png)
 
 ## Project structure
 
